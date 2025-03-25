@@ -26,7 +26,7 @@ sudo nano /etc/hosts
 Adicione:
 
 ```
-127.0.0.1 <seuhos
+127.0.0.1 <seuhost>
 ```
 
 Isso faz com que ao acessar <seuhost>, você acesse seu próprio servidor local.
