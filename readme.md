@@ -26,7 +26,7 @@ sudo nano /etc/hosts
 Adicione:
 
 ```
-127.0.0.1 <seuhost>
+127.0.0.1 <seuhos
 ```
 
 Isso faz com que ao acessar <seuhost>, você acesse seu próprio servidor local.
@@ -51,7 +51,13 @@ mkcert <seuhost>
 
 Isso vai gerar dois arquivos .pem
 
-### 3. Rodar o servidor com HTTPS
+### 3. Instalar os pacotes necessários
+
+```
+npm install
+```
+
+### 4. Rodar o servidor com HTTPS
 
 ```
 sudo node server.js
