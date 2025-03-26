@@ -54,3 +54,46 @@ async function handleRegister() {
     console.error(err);
   }
 }
+
+async function handleLogin() {
+  const input = document.getElementById("fidoInput").value;
+  const output = document.getElementById("output");
+
+  try {
+    const parsed = JSON.parse(input);
+
+    const opts = parsed.fidoAuthenticationOptions || parsed;
+
+    const publicKey = {
+      ...opts,
+      challenge: base64urlToBuffer(opts.challenge),
+    };
+
+    console.log(publicKey);
+
+    const assertion = await navigator.credentials.get({ publicKey });
+
+    console.log(assertion);
+
+    const response = {
+      id: assertion.id,
+      rawId: bufferToBase64url(assertion.rawId),
+      type: assertion.type,
+      response: {
+        authenticatorData: bufferToBase64url(
+          assertion.response.authenticatorData
+        ),
+        clientDataJSON: bufferToBase64url(assertion.response.clientDataJSON),
+        signature: bufferToBase64url(assertion.response.signature),
+        userHandle: assertion.response.userHandle
+          ? bufferToBase64url(assertion.response.userHandle)
+          : null,
+      },
+    };
+
+    output.textContent = JSON.stringify(response, null, 2);
+  } catch (err) {
+    output.textContent = `Erro: ${err.message}`;
+    console.error(err);
+  }
+}
