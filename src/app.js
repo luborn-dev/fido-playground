@@ -1,7 +1,3 @@
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("Origin on DOMContentLoaded:", window.location.origin);
-});
-
 function base64urlToBuffer(base64url) {
   const padding = "=".repeat((4 - (base64url.length % 4)) % 4);
   const base64 = (base64url + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -16,7 +12,7 @@ function bufferToBase64url(buffer) {
 }
 
 async function handleRegister() {
-  const input = document.getElementById("fidoInput").value;
+  const input = document.getElementById("registerInput").value;
   const output = document.getElementById("output");
 
   try {
@@ -56,38 +52,43 @@ async function handleRegister() {
 }
 
 async function handleLogin() {
-  const input = document.getElementById("fidoInput").value;
+  const input = document.getElementById("loginInput").value;
   const output = document.getElementById("output");
 
   try {
     const parsed = JSON.parse(input);
 
-    const opts = parsed.fidoAuthenticationOptions || parsed;
+    if (!parsed.fidoChallenge || !parsed.rawId) {
+      throw new Error("fidoChallenge ou rawId ausente no JSON");
+    }
 
     const publicKey = {
-      ...opts,
-      challenge: base64urlToBuffer(opts.challenge),
+      challenge: base64urlToBuffer(parsed.fidoChallenge),
+      rpId: "openbanking.sandbox.api.pagseguro.com",
+      allowCredentials: [
+        {
+          id: base64urlToBuffer(parsed.rawId),
+          type: "public-key",
+        },
+      ],
+      userVerification: "preferred",
     };
 
-    console.log(publicKey);
+    console.log("PublicKeyRequest:", publicKey);
 
     const assertion = await navigator.credentials.get({ publicKey });
-
-    console.log(assertion);
 
     const response = {
       id: assertion.id,
       rawId: bufferToBase64url(assertion.rawId),
       type: assertion.type,
       response: {
-        authenticatorData: bufferToBase64url(
-          assertion.response.authenticatorData
-        ),
+        authenticatorData: bufferToBase64url(assertion.response.authenticatorData),
         clientDataJSON: bufferToBase64url(assertion.response.clientDataJSON),
         signature: bufferToBase64url(assertion.response.signature),
         userHandle: assertion.response.userHandle
-          ? bufferToBase64url(assertion.response.userHandle)
-          : null,
+            ? bufferToBase64url(assertion.response.userHandle)
+            : null,
       },
     };
 
@@ -97,3 +98,4 @@ async function handleLogin() {
     console.error(err);
   }
 }
+

@@ -4,11 +4,9 @@ const express = require("express");
 
 const app = express();
 
-app.use(express.static("./"));
+app.use(express.static("./public"));
+app.use("/src", express.static("./src"));
 
-app.get("/", (req, res) => {
-  res.send("Hello HTTPS com WebAuthn!");
-});
 
 const options = {
   key: fs.readFileSync("openbanking.sandbox.api.pagseguro.com-key.pem"),
